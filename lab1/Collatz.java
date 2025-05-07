@@ -8,9 +8,9 @@ public class Collatz {
         if (n == 1) {
             return 1;
         } else if (n % 2 == 0) {
-            return n / 2;
+            return (n / 2);
         } else {
-            return n * 3 + 1;
+            return (n * 3 + 1);
         }
     }
 
