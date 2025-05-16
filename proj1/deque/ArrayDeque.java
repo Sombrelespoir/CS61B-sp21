@@ -112,7 +112,7 @@ public class ArrayDeque<T> implements Deque<T> {
         return items[realIndex];
     }
 
-    private class ArrayDequeIterator implements Iterator<T> {
+    private class ArrayDequeIterator implements Iterator2<T> {
         private int position;
         private int count;
 
@@ -133,17 +133,21 @@ public class ArrayDeque<T> implements Deque<T> {
         }
     }
 
-    public Iterator<T> iterator() {
+    public Iterator2<T> iterator() {
         return new ArrayDequeIterator();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ArrayDeque)) return false;
+        if (!(o instanceof ArrayDeque)) {
+            return false;
+        }
 
         ArrayDeque<?> other = (ArrayDeque<?>) o;
-        if (size != other.size) return false;
+        if (size != other.size) {
+            return false;
+        }
 
         for (int i = 0; i < size; i++) {
             if (!get(i).equals(other.get(i))) {
@@ -152,6 +156,11 @@ public class ArrayDeque<T> implements Deque<T> {
         }
         return true;
     }
+}
+
+interface Iterator2<T> {
+    boolean hasNext();
+    T next();
 }
 
 
