@@ -1,6 +1,6 @@
 package deque;
 
-import org.checkerframework.checker.units.qual.C;
+import java.util.Comparator;
 
 public class MaxArrayDeque<T> extends ArrayDeque<T> {
 
@@ -31,6 +31,4 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
     }
 }
 
-interface Comparator<T> {
-    int compare(T a, T b);
-}
+
