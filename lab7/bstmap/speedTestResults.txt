@@ -1,0 +1,5 @@
+Below is my result after testing InsertRandomSpeedTest for many times:
+
+    Time of running:
+
+    ULLMap >> BSTMap > Java's Built-in TreeMap > Java's Built-in HashMap
