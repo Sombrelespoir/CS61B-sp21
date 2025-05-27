@@ -1,0 +1,21 @@
+In the InsertRandomSpeedTest:
+
+    time for running:   ULLMap  >>  MyHashMap  >  Java's HashMap
+
+
+In the insertOrderSpeedTest:
+
+    time for running:   ULLMap  >>  MyHashMap  >  Java's HashMap
+
+
+For the 5 data structures:
+
+    time for running:
+
+        LL:     0.46 sec
+        HS:     0.46 sec
+        TS:     0.43 sec
+        PQ:     0.43 sec
+        AL:     0.42 sec
+
+That is, Linklist  ~=  HashSet  >  TreeSet  ~=  PriorityQueue  >  ArrayList.
