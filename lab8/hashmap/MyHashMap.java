@@ -17,18 +17,13 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * Protected helper class to store key/value pairs
      * The protected qualifier allows subclass access
      */
-    protected class Node implements Comparable<Node> {
+    protected class Node {
         K key;
         V value;
 
         Node(K k, V v) {
             key = k;
             value = v;
-        }
-
-        @Override
-        public int compareTo(Node other) {
-            return Integer.compare(this.key.hashCode(), other.key.hashCode());
         }
     }
 
