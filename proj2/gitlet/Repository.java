@@ -133,7 +133,7 @@ public class Repository {
         File newCommitFile = join(COMMIT_DIR, newCommitId);
         writeObject(newCommitFile, newCommit);
 
-        writeObject(HEAD, newCommitId);
+        writeContents(HEAD, newCommitId);
 
         String currentBranch = readContentsAsString(CURRENT_BRANCH);
         File branchFile = join(BRANCHES, currentBranch);
@@ -367,7 +367,7 @@ public class Repository {
         File commitFile = join(COMMIT_DIR, commitId);
 
         if (!commitFile.exists()) {
-            System.out.println("No commit with that id exist.");
+            System.out.println("No commit with that id exists.");
             return;
         }
 
