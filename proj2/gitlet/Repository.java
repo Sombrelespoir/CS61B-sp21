@@ -84,7 +84,7 @@ public class Repository {
         }
 
         //check if file is already in current commit
-        if (currentCommit.getBlobs().containsKey(filePath) && currentCommit.getBlobs().get(filePath).equals(blobId)) {
+        if (currentBlobs.containsKey(filePath) && currentBlobs.get(filePath).equals(blobId)) {
             stagingArea.remove(filePath);
             removalArea.remove(filePath);
         } else {
@@ -124,7 +124,7 @@ public class Repository {
             currentBlobs = new HashMap<>();
         }
 
-        HashMap<String, String> newBlobs = new HashMap<>(currentCommit.getBlobs());
+        HashMap<String, String> newBlobs = new HashMap<>(currentBlobs);
 
         for (String file : stagingArea.keySet()) {
             newBlobs.put(file, stagingArea.get(file));
@@ -217,7 +217,13 @@ public class Repository {
         Commit currentCommit = readObject(currentCommitFile, Commit.class);
 
         boolean staged = stagingArea.containsKey(fileName);
-        boolean tracked = currentCommit.getBlobs().containsKey(fileName);
+
+        HashMap<String, String> currentBlobs = currentCommit.getBlobs();
+        if (currentBlobs == null) {
+            currentBlobs = new HashMap<>();
+        }
+
+        boolean tracked = currentBlobs.containsKey(fileName);
 
         if (!staged && !tracked) {
             System.out.println("No reason to remove the file.");
@@ -279,12 +285,17 @@ public class Repository {
 
         Commit commit = readObject(commitFile, Commit.class);
 
-        if (!commit.getBlobs().containsKey(fileName)) {
+        HashMap<String, String> blobs = commit.getBlobs();
+        if (blobs == null) {
+            blobs = new HashMap<>();
+        }
+
+        if (!blobs.containsKey(fileName)) {
             System.out.println("File does not exist in that commit.");
             return;
         }
 
-        String blobId = commit.getBlobs().get(fileName);
+        String blobId = blobs.get(fileName);
         File blobFile = join(BLOB_DIR, blobId);
 
         byte[] contents = readContents(blobFile);
@@ -315,16 +326,25 @@ public class Repository {
         File currentCommitFile = join(COMMIT_DIR, currentCommitId);
         Commit currentCommit = readObject(currentCommitFile, Commit.class);
 
+        HashMap<String, String> currentBlobs = currentCommit.getBlobs();
+        if (currentBlobs == null) {
+            currentBlobs = new HashMap<>();
+        }
+        HashMap<String, String> targetBlobs = targetCommit.getBlobs();
+        if (targetBlobs == null) {
+            targetBlobs = new HashMap<>();
+        }
+
         List<String> workingDirFiles = plainFilenamesIn(CWD);
         for (String file : workingDirFiles) {
-            if (!currentCommit.getBlobs().containsKey(file) && targetCommit.getBlobs().containsKey(file)) {
+            if (!currentBlobs.containsKey(file) && targetBlobs.containsKey(file)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
         }
 
-        for (String file : currentCommit.getBlobs().keySet()) {
-            if (!targetCommit.getBlobs().containsKey(file)) {
+        for (String file : currentBlobs.keySet()) {
+            if (!targetBlobs.containsKey(file)) {
                 File fileToDelete = join(CWD, file);
                 if (fileToDelete.exists()) {
                     fileToDelete.delete();
@@ -332,8 +352,8 @@ public class Repository {
             }
         }
 
-        for (String file : targetCommit.getBlobs().keySet()) {
-            String blobId = targetCommit.getBlobs().get(file);
+        for (String file : targetBlobs.keySet()) {
+            String blobId = targetBlobs.get(file);
             File blobFile = join(BLOB_DIR, blobId);
             File targetFile = join(CWD, file);
 
@@ -410,16 +430,25 @@ public class Repository {
         File currentCommitFile = join(COMMIT_DIR, currentCommitId);
         Commit currentCommit = readObject(currentCommitFile, Commit.class);
 
+        HashMap<String, String> currentBlobs = currentCommit.getBlobs();
+        if (currentBlobs == null) {
+            currentBlobs = new HashMap<>();
+        }
+        HashMap<String, String> targetBlobs = targetCommit.getBlobs();
+        if (targetBlobs == null) {
+            targetBlobs = new HashMap<>();
+        }
+
         List<String> workingDirFiles = plainFilenamesIn(CWD);
         for (String file : workingDirFiles) {
-            if (!currentCommit.getBlobs().containsKey(file) && targetCommit.getBlobs().containsKey(file)) {
+            if (!currentBlobs.containsKey(file) && targetBlobs.containsKey(file)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
         }
 
-        for (String file : currentCommit.getBlobs().keySet()) {
-            if (!targetCommit.getBlobs().containsKey(file)) {
+        for (String file : currentBlobs.keySet()) {
+            if (!targetBlobs.containsKey(file)) {
                 File fileToDelete = join(CWD, file);
                 if (fileToDelete.exists()) {
                     fileToDelete.delete();
@@ -427,7 +456,7 @@ public class Repository {
             }
         }
 
-        for (String file : targetCommit.getBlobs().keySet()) {
+        for (String file : targetBlobs.keySet()) {
             checkoutFileFromCommit(commitId, file);
         }
 
@@ -477,5 +506,4 @@ public class Repository {
             System.out.println("Found no commit with that message.");
         }
     }
-
 }
