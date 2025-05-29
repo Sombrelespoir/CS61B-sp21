@@ -61,6 +61,7 @@ public class Main {
                 repo.reset(args[1]);
                 break;
             case "checkout":
+                handleCheckout(args, repo);
                 break;
 
             default:

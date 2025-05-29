@@ -256,7 +256,6 @@ public class Repository {
         if (commitId.length() < 40) {
             List<String> commits = plainFilenamesIn(COMMIT_DIR);
             List<String> matchingCommits = new ArrayList<>();
-            String fullCommitId = null;
             for (String commit : commits) {
                 if (commit.startsWith(commitId)) {
                    matchingCommits.add(commit);
