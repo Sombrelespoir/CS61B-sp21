@@ -183,6 +183,9 @@ public class Repository {
         String commitId = readContentsAsString(HEAD);
         while (commitId != null) {
             File commitFile = join(COMMIT_DIR, commitId);
+            if (!commitFile.exists()) {
+                break;
+            }
             Commit commit = readObject(commitFile, Commit.class);
 
             System.out.println("===");
@@ -230,6 +233,14 @@ public class Repository {
     public void checkoutFile(String fileName) {
         String commitId = readContentsAsString(HEAD);
         checkoutFileFromCommit(commitId, fileName);
+
+        HashMap<String, String> stagingArea = readObject(STAGING_AREA, HashMap.class);
+        stagingArea.remove(fileName);
+        writeObject(STAGING_AREA, stagingArea);
+
+        HashMap<String, Boolean> removalArea = readObject(REMOVAL_AREA, HashMap.class);
+        removalArea.remove(fileName);
+        writeObject(REMOVAL_AREA, removalArea);
     }
 
     public void checkoutFileFromCommit(String commitId, String fileName) {
@@ -263,7 +274,6 @@ public class Repository {
 
         File targetFile = join(CWD, fileName);
         writeContents(targetFile, contents);
-
     }
 
     public void checkoutBranch(String branchName) {

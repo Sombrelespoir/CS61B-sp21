@@ -25,7 +25,7 @@ public class Commit implements Serializable {
         this.parent = parent;
         this.blobs = new HashMap<>();
 
-        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy z");
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
 
         if (this.parent == null) {
             Date epochDate = new Date(0L);
