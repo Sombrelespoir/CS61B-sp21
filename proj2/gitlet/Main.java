@@ -1,7 +1,5 @@
 package gitlet;
 
-import net.sf.saxon.trans.SymbolicName;
-
 import java.io.File;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
