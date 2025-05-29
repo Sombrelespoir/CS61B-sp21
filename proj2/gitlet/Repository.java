@@ -246,12 +246,18 @@ public class Repository {
     public void checkoutFileFromCommit(String commitId, String fileName) {
         if (commitId.length() < 40) {
             List<String> commits = plainFilenamesIn(COMMIT_DIR);
+            String fullCommitId = null;
             for (String commit : commits) {
                 if (commit.startsWith(commitId)) {
-                    commitId = commit;
+                    fullCommitId = commit;
                     break;
                 }
             }
+            if (fullCommitId == null) {
+                System.out.println("No commit with that id exists.");
+                return;
+            }
+            commitId = fullCommitId;
         }
         File commitFile = join(COMMIT_DIR, commitId);
 
@@ -366,12 +372,18 @@ public class Repository {
     public void reset(String commitId) {
         if (commitId.length() < 40) {
             List<String> commits = plainFilenamesIn(COMMIT_DIR);
+            String fullCommitId = null
             for (String commit : commits) {
                 if (commit.startsWith(commitId)) {
-                    commitId = commit;
+                    fullCommitId = commit;
                     break;
                 }
             }
+            if (fullCommitId == null) {
+                System.out.println("No commit with that id exists.");
+                return;
+            }
+            commitId = fullCommitId;
         }
 
         File commitFile = join(COMMIT_DIR, commitId);
