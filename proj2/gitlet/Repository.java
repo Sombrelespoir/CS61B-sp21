@@ -249,13 +249,6 @@ public class Repository {
         String commitId = readContentsAsString(HEAD);
         checkoutFileFromCommit(commitId, fileName);
 
-        HashMap<String, String> stagingArea = readObject(STAGING_AREA, HashMap.class);
-        stagingArea.remove(fileName);
-        writeObject(STAGING_AREA, stagingArea);
-
-        HashMap<String, Boolean> removalArea = readObject(REMOVAL_AREA, HashMap.class);
-        removalArea.remove(fileName);
-        writeObject(REMOVAL_AREA, removalArea);
     }
 
     public void checkoutFileFromCommit(String commitId, String fileName) {
