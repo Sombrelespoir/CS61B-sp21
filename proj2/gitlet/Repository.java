@@ -40,7 +40,7 @@ public class Repository {
         BRANCHES.mkdir();
 
         Commit initialCommit = new Commit("initial commit", null);
-        String commitId = sha1(initialCommit);
+        String commitId = sha1(serialize(initialCommit));
         initialCommit.setId(commitId);
 
         File commitFile = join(COMMIT_DIR, commitId);
@@ -72,7 +72,7 @@ public class Repository {
         HashMap<String, Boolean> removalArea = readObject(REMOVAL_AREA, HashMap.class);
 
         byte[] contents = readContents(file);
-        String blobId = sha1(file);
+        String blobId = sha1(contents);
 
         String currentCommitId = readContentsAsString(HEAD);
         File currentCommitFile = join(COMMIT_DIR, currentCommitId);
@@ -127,7 +127,7 @@ public class Repository {
 
         newCommit.setBlobs(newBlobs);
 
-        String newCommitId = sha1(newCommit);
+        String newCommitId = sha1(serialize(newCommit));
         newCommit.setId(newCommitId);
 
         File newCommitFile = join(COMMIT_DIR, newCommitId);
@@ -149,7 +149,7 @@ public class Repository {
 
     public void status() {
         System.out.println("=== Branches ===");
-        String currentBranch = readContentsAsString(HEAD);
+        String currentBranch = readContentsAsString(CURRENT_BRANCH);
         List<String> branches = plainFilenamesIn(BRANCHES);
         for (String branch : branches) {
             if (branch.equals(currentBranch)) {
@@ -186,8 +186,8 @@ public class Repository {
             Commit commit = readObject(commitFile, Commit.class);
 
             System.out.println("===");
-            System.out.println("commit" + commitId);
-            System.out.println("Date:" + commit.getTimeStamp());
+            System.out.println("commit " + commitId);
+            System.out.println("Date: " + commit.getTimeStamp());
             System.out.println(commit.getMessage());
             System.out.println();
 
@@ -245,7 +245,7 @@ public class Repository {
         File commitFile = join(COMMIT_DIR, commitId);
 
         if (!commitFile.exists()) {
-            System.out.println("No commit with that id exits.");
+            System.out.println("No commit with that id exists.");
             return;
         }
 
@@ -419,8 +419,8 @@ public class Repository {
             Commit commit = readObject(commitFile, Commit.class);
 
             System.out.println("===");
-            System.out.println("commit:" + commitId);
-            System.out.println("Date:" + commit.getTimeStamp());
+            System.out.println("commit " + commitId);
+            System.out.println("Date: " + commit.getTimeStamp());
             System.out.println(commit.getMessage());
             System.out.println();
         }
