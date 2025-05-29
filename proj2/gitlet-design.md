@@ -1,15 +1,17 @@
 # Gitlet Design Document
 
-**Name**:
+**Name**: Zhang Yusen
 
 ## Classes and Data Structures
 
-### Class 1
+### 1.Commit
 
-#### Fields
+#### Instance Variables
+* Message - contains the message of the commit.
+* Timestamp - time at which a commit was created.
+* Parent - the parent commit of a commit.
 
-1. Field 1
-2. Field 2
+
 
 
 ### Class 2

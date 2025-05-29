@@ -1,26 +1,78 @@
 package gitlet;
 
-// TODO: any imports you need here
 
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.io.File;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 
 /** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ *  @author ZhangYusen
  */
-public class Commit {
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
-     */
+public class Commit implements Serializable {
 
-    /** The message of this Commit. */
     private String message;
+    private String date;
+    private String parent;
+    private String id;
+    private HashMap<String, String> blobs;
 
-    /* TODO: fill in the rest of this class. */
+    public Commit(String message, String parent) {
+        this.message = message;
+        this.parent = parent;
+        this.blobs = new HashMap<>();
+
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy z");
+
+        if (this.parent == null) {
+            Date epochDate = new Date(0L);
+            this.date = formatter.format(epochDate);
+        } else {
+            Date now = new Date();
+            this.date = formatter.format(now);
+        }
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getTimeStamp() {
+        return date;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public HashMap<String, String> getBlobs() {
+        return blobs;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String commitId) {
+        this.id = commitId;
+    }
+
+    public void setBlobs(HashMap<String, String> blobs) {
+        this.blobs = blobs;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
