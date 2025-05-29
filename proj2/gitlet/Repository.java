@@ -372,7 +372,7 @@ public class Repository {
     public void reset(String commitId) {
         if (commitId.length() < 40) {
             List<String> commits = plainFilenamesIn(COMMIT_DIR);
-            String fullCommitId = null
+            String fullCommitId = null;
             for (String commit : commits) {
                 if (commit.startsWith(commitId)) {
                     fullCommitId = commit;
