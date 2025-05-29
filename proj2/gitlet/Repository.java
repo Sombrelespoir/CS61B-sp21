@@ -78,6 +78,11 @@ public class Repository {
         File currentCommitFile = join(COMMIT_DIR, currentCommitId);
         Commit currentCommit = readObject(currentCommitFile, Commit.class);
 
+        HashMap<String, String> currentBlobs = currentCommit.getBlobs();
+        if (currentBlobs == null) {
+            currentBlobs = new HashMap<>();
+        }
+
         //check if file is already in current commit
         if (currentCommit.getBlobs().containsKey(filePath) && currentCommit.getBlobs().get(filePath).equals(blobId)) {
             stagingArea.remove(filePath);
@@ -86,12 +91,11 @@ public class Repository {
             stagingArea.put(filePath, blobId);
             File blobFile = join(BLOB_DIR, blobId);
             writeContents(blobFile, contents);
+            removalArea.remove(filePath);
         }
 
         writeObject(STAGING_AREA, stagingArea);
-
         writeObject(REMOVAL_AREA, removalArea);
-
     }
 
     public void commit(String commitMessage) {
@@ -114,6 +118,11 @@ public class Repository {
         Commit currentCommit = readObject(currentCommitFile, Commit.class);
 
         Commit newCommit = new Commit(commitMessage, currentCommitId);
+
+        HashMap<String, String> currentBlobs = currentCommit.getBlobs();
+        if (currentBlobs == null) {
+            currentBlobs = new HashMap<>();
+        }
 
         HashMap<String, String> newBlobs = new HashMap<>(currentCommit.getBlobs());
 
@@ -249,8 +258,11 @@ public class Repository {
             String fullCommitId = null;
             for (String commit : commits) {
                 if (commit.startsWith(commitId)) {
+                    if (fullCommitId != null) {
+                        System.out.println("No commit with that id exists.");
+                        return;
+                    }
                     fullCommitId = commit;
-                    break;
                 }
             }
             if (fullCommitId == null) {
@@ -260,7 +272,6 @@ public class Repository {
             commitId = fullCommitId;
         }
         File commitFile = join(COMMIT_DIR, commitId);
-
         if (!commitFile.exists()) {
             System.out.println("No commit with that id exists.");
             return;
