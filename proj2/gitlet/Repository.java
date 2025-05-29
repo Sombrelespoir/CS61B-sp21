@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -254,21 +255,22 @@ public class Repository {
     public void checkoutFileFromCommit(String commitId, String fileName) {
         if (commitId.length() < 40) {
             List<String> commits = plainFilenamesIn(COMMIT_DIR);
+            List<String> matchingCommits = new ArrayList<>();
             String fullCommitId = null;
             for (String commit : commits) {
                 if (commit.startsWith(commitId)) {
-                    if (fullCommitId != null) {
-                        System.out.println("No commit with that id exists.");
-                        return;
-                    }
-                    fullCommitId = commit;
+                   matchingCommits.add(commit);
                 }
             }
-            if (fullCommitId == null) {
+            if (matchingCommits.isEmpty()) {
                 System.out.println("No commit with that id exists.");
                 return;
             }
-            commitId = fullCommitId;
+            if (matchingCommits.size() > 1) {
+                System.out.println("Ambiguous commit id: multiple matches found.");
+                return;
+            }
+            commitId = matchingCommits.get(0);
         }
         File commitFile = join(COMMIT_DIR, commitId);
         if (!commitFile.exists()) {
@@ -396,18 +398,21 @@ public class Repository {
     public void reset(String commitId) {
         if (commitId.length() < 40) {
             List<String> commits = plainFilenamesIn(COMMIT_DIR);
-            String fullCommitId = null;
+            List<String> matchingCommits = new ArrayList<>();
             for (String commit : commits) {
                 if (commit.startsWith(commitId)) {
-                    fullCommitId = commit;
-                    break;
+                    matchingCommits.add(commit);
                 }
             }
-            if (fullCommitId == null) {
+            if (matchingCommits.isEmpty()) {
                 System.out.println("No commit with that id exists.");
                 return;
             }
-            commitId = fullCommitId;
+            if (matchingCommits.size() > 1) {
+                System.out.println("Ambiguous commit id: multiple matches found.");
+                return;
+            }
+            commitId = matchingCommits.get(0);
         }
 
         File commitFile = join(COMMIT_DIR, commitId);
