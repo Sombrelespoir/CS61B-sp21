@@ -462,9 +462,6 @@ public class RepositoryTest {
         // Should not be in staging area
         HashMap<String, String> stagingArea = readObject(Repository.STAGING_AREA, HashMap.class);
         assertFalse(stagingArea.containsKey("test.txt"));
-
     }
-
-
 }
 
