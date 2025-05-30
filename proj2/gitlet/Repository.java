@@ -704,8 +704,11 @@ public class Repository {
             return true;
         }
 
-        return (splitBlobId == null && currentBlobId == null && branchBlobId != null)
-                || (currentBlobId == null && branchBlobId != null && splitBlobId != null);
+        if (splitBlobId == null && currentBlobId == null && branchBlobId != null) {
+            return true;
+        }
+
+        return false;
     }
 
     private boolean shouldRemoveFile(String currentBlobId, String branchBlobId,
@@ -757,7 +760,7 @@ public class Repository {
         removalArea.clear();
         writeObject(STAGING_AREA, stagingArea);
         writeObject(REMOVAL_AREA, removalArea);
-        
+
     }
 
     private void handleMergeConflict(String file, String currentBlobId, String branchBlobId, 
