@@ -82,7 +82,7 @@ public class Main {
                 validateNumArgs(args, 3);
                 repo.addRemote(args[1], args[2]);
                 break;
-            case "re-remote":
+            case "rm-remote":
                 validateNumArgs(args, 2);
                 repo.rmRemote(args[1]);
                 break;
