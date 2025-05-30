@@ -1,6 +1,5 @@
 package gitlet;
 
-import javax.print.DocFlavor;
 import java.io.File;
 import java.util.*;
 import static gitlet.Utils.*;
@@ -245,9 +244,7 @@ public class Repository {
                     if (!workingBlobId.equals(stagedBlobId)) {
                         modifications.add(file + " (modified)");
                     }
-                }
-                // File is in current commit, not staged, but working version differs
-                else if (currentBlobs.containsKey(file)) {
+                } else if (currentBlobs.containsKey(file)) {
                     String committedBlobId = currentBlobs.get(file);
                     if (!workingBlobId.equals(committedBlobId)) {
                         modifications.add(file + " (modified)");
@@ -255,7 +252,7 @@ public class Repository {
                 }
             }
         }
-        
+
         return modifications;
     }
 
@@ -1133,5 +1130,10 @@ public class Repository {
         return commitsToCopy;
     }
 
+    public void pull(String remoteName, String remoteBranchName) {
+        fetch(remoteName, remoteBranchName);
+        String trackingBranchName = remoteName + "/" + remoteBranchName;
+        merge(trackingBranchName);
+    }
 
 }
