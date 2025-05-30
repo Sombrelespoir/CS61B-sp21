@@ -1,7 +1,5 @@
 package gitlet;
 
-
-import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,6 +17,7 @@ public class Commit implements Serializable {
     private String parent;
     private String id;
     private HashMap<String, String> blobs;
+    private String secondParent;
 
     public Commit(String message, String parent) {
         this.message = message;
@@ -56,12 +55,18 @@ public class Commit implements Serializable {
         return id;
     }
 
+    public String getSecondParent() { return secondParent; }
+
     public void setId(String commitId) {
         this.id = commitId;
     }
 
     public void setBlobs(HashMap<String, String> blobs) {
         this.blobs = blobs;
+    }
+
+    public void setSecondParent(String secondParent) {
+        this.secondParent = secondParent;
     }
 }
 

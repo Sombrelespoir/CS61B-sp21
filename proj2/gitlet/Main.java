@@ -63,6 +63,10 @@ public class Main {
             case "checkout":
                 handleCheckout(args, repo);
                 break;
+            case "merge":
+                validateNumArgs(args, 2);
+                repo.merge(args[1]);
+                break;
 
             default:
                 System.out.println("No command with that name exists.");

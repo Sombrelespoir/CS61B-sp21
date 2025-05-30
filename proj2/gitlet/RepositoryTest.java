@@ -30,7 +30,7 @@ public class RepositoryTest {
         // Save original CWD and redirect stdout
         originalCWD = new File(System.getProperty("user.dir"));
         System.setProperty("user.dir", tempDir.toString());
-        
+        Repository.initializePaths();
         outContent = new ByteArrayOutputStream();
         originalOut = System.out;
         System.setOut(new PrintStream(outContent));
@@ -463,5 +463,7 @@ public class RepositoryTest {
         // Should not be in staging area
         HashMap<String, String> stagingArea = readObject(Repository.STAGING_AREA, HashMap.class);
         assertFalse(stagingArea.containsKey("test.txt"));
+
     }
+
 }
