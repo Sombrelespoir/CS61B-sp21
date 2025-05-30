@@ -794,5 +794,4 @@ public class Repository {
         stagingArea.put(file, blobId);
 
     }
-
 }

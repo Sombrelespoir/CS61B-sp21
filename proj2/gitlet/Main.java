@@ -1,12 +1,16 @@
 package gitlet;
 
 import java.io.File;
+import static gitlet.Utils.join;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author Zhang Yusen
  */
 public class Main {
 
+    public static final File CWD = new File(System.getProperty("user.dir"));
+
+    public static final File GITLET_DIR = join(CWD, ".gitlet");
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND1> <OPERAND2> ... 
      */
@@ -18,11 +22,18 @@ public class Main {
 
         Repository repo = new Repository();
         String firstArg = args[0];
+
+        if (firstArg.equals("init")) {
+            Repository.setupPersistence();
+            return;
+        }
+
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
+
         switch(firstArg) {
-            // Create a new Gitlet version-control system
-            case "init":
-                Repository.setupPersistence();
-                break;
             case "add":
                 validateNumArgs(args, 2);
                 repo.add(args[1]);
