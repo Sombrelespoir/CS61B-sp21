@@ -521,12 +521,12 @@ public class Repository {
         Commit branchCommit = readObject(join(COMMIT_DIR, branchCommitId), Commit.class);
         Commit splitCommit = readObject(join(COMMIT_DIR, splitPointId), Commit.class);
 
-        HashMap<String, String> currentBlobs = currentCommit.getBlobs() != null ?
-                currentCommit.getBlobs() : new HashMap<>();
-        HashMap<String, String> branchBlobs = branchCommit.getBlobs() != null ?
-                branchCommit.getBlobs() : new HashMap<>();
-        HashMap<String, String> splitBlobs = splitCommit.getBlobs() != null ?
-                splitCommit.getBlobs() : new HashMap<>();
+        HashMap<String, String> currentBlobs = currentCommit.getBlobs() != null
+                ? currentCommit.getBlobs() : new HashMap<>();
+        HashMap<String, String> branchBlobs = branchCommit.getBlobs() != null
+                ? branchCommit.getBlobs() : new HashMap<>();
+        HashMap<String, String> splitBlobs = splitCommit.getBlobs() != null
+                ? splitCommit.getBlobs() : new HashMap<>();
 
         if (hasUntrackedConflicts(currentBlobs, branchBlobs)) {
             return;
@@ -621,7 +621,8 @@ public class Repository {
         return true;
     }
 
-    private boolean handleSpecialCases(String splitPointId, String branchCommitId, String branchName) {
+    private boolean handleSpecialCases(String splitPointId, String branchCommitId,
+                                       String branchName) {
         if (splitPointId.equals(branchCommitId)) {
             System.out.println("Given branch is an ancestor of the current branch.");
             return true;
@@ -684,28 +685,31 @@ public class Repository {
     private boolean mergeFileNeedsConflictResolution(String currentBlobId, String branchBlobId,
                                                      String splitBlobId) {
         if (currentBlobId != null && branchBlobId != null && !currentBlobId.equals(branchBlobId)
-                && (splitBlobId == null || (!currentBlobId.equals(splitBlobId) && !branchBlobId.equals(splitBlobId)))) {
+                && (splitBlobId == null || (!currentBlobId.equals(splitBlobId)
+                && !branchBlobId.equals(splitBlobId)))) {
             return true;
         }
 
-        return (currentBlobId == null && branchBlobId != null && splitBlobId != null &&
-                !branchBlobId.equals(splitBlobId))
-                || (currentBlobId != null && branchBlobId == null && splitBlobId != null &&
-                        !currentBlobId.equals(splitBlobId));
+        return (currentBlobId == null && branchBlobId != null && splitBlobId != null
+                && !branchBlobId.equals(splitBlobId))
+                || (currentBlobId != null && branchBlobId == null && splitBlobId != null
+                && !currentBlobId.equals(splitBlobId));
     }
 
-    private boolean shouldTakeBranchVersion(String currentBlobId, String branchBlobId, String splitBlobId) {
+    private boolean shouldTakeBranchVersion(String currentBlobId, String branchBlobId,
+                                            String splitBlobId) {
 
         if (currentBlobId != null && branchBlobId != null && splitBlobId != null
                 && splitBlobId.equals(currentBlobId) && !splitBlobId.equals(branchBlobId)) {
             return true;
         }
 
-        return (splitBlobId == null && currentBlobId == null && branchBlobId != null) ||
-                (currentBlobId == null && branchBlobId != null && splitBlobId != null);
+        return (splitBlobId == null && currentBlobId == null && branchBlobId != null)
+                || (currentBlobId == null && branchBlobId != null && splitBlobId != null);
     }
 
-    private boolean shouldRemoveFile(String currentBlobId, String branchBlobId, String splitBlobId) {
+    private boolean shouldRemoveFile(String currentBlobId, String branchBlobId,
+                                     String splitBlobId) {
         return currentBlobId != null && branchBlobId == null && splitBlobId != null;
     }
 
@@ -737,10 +741,23 @@ public class Repository {
         File currentBranchFile = join(BRANCHES, currentBranch);
         writeContents(currentBranchFile, mergeCommitId);
 
+        List<String> workingDirFiles = plainFilenamesIn(CWD);
+        if (workingDirFiles != null) {
+            for (String file : workingDirFiles) {
+                if (!newBlobs.containsKey(file)) {
+                    File fileToDelete = join(CWD, file);
+                    if (fileToDelete.exists()) {
+                        fileToDelete.delete();
+                    }
+                }
+            }
+        }
+
         stagingArea.clear();
         removalArea.clear();
         writeObject(STAGING_AREA, stagingArea);
         writeObject(REMOVAL_AREA, removalArea);
+        
     }
 
     private void handleMergeConflict(String file, String currentBlobId, String branchBlobId, 
@@ -774,4 +791,5 @@ public class Repository {
         stagingArea.put(file, blobId);
 
     }
+
 }
