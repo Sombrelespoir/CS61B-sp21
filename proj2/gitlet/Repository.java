@@ -14,34 +14,20 @@ import static gitlet.Utils.*;
  */
 public class Repository {
    
-    public static File CWD;
+    public static final File CWD = new File(System.getProperty("user.dir"));
 
-    public static File GITLET_DIR;
+    public static final File GITLET_DIR = join(CWD, ".gitlet");
 
-    public static File COMMIT_DIR;
-    public static File BLOB_DIR;
-    public static File STAGING_AREA;
-    public static File HEAD;
-    public static File BRANCHES;
-    public static File CURRENT_BRANCH;
-    public static File REMOVAL_AREA;
+    public static final File COMMIT_DIR = join(GITLET_DIR, "commits");
+    public static final File BLOB_DIR = join(GITLET_DIR, "blobs");
+    public static final File STAGING_AREA = join(GITLET_DIR, "staging");
+    public static final File HEAD = join(GITLET_DIR, "HEAD");
+    public static final File BRANCHES = join(GITLET_DIR, "branches");
+    public static final File CURRENT_BRANCH = join(GITLET_DIR, "current_branch");
+    public static final File REMOVAL_AREA = join(GITLET_DIR, "removal");
 
-    public static void initializePaths() {
-        CWD = new File(System.getProperty("user.dir"));
-
-        GITLET_DIR = join(CWD, ".gitlet");
-
-        COMMIT_DIR = join(GITLET_DIR, "commits");
-        BLOB_DIR = join(GITLET_DIR, "blobs");
-        STAGING_AREA = join(GITLET_DIR, "staging");
-        HEAD = join(GITLET_DIR, "HEAD");
-        BRANCHES = join(GITLET_DIR, "branches");
-        CURRENT_BRANCH = join(GITLET_DIR, "current_branch");
-        REMOVAL_AREA = join(GITLET_DIR, "removal");
-    }
 
     public static void setupPersistence() {
-        initializePaths();
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already" +
                     " exists in the current directory.");

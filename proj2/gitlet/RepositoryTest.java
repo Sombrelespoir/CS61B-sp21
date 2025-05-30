@@ -30,7 +30,6 @@ public class RepositoryTest {
         // Save original CWD and redirect stdout
         originalCWD = new File(System.getProperty("user.dir"));
         System.setProperty("user.dir", tempDir.toString());
-        Repository.initializePaths();
         outContent = new ByteArrayOutputStream();
         originalOut = System.out;
         System.setOut(new PrintStream(outContent));
