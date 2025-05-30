@@ -883,14 +883,16 @@ public class Repository {
         while (current != null && !current.equals(remoteCommitId)) {
             commitToCopy.add(current);
             File commitFile = join(COMMIT_DIR, current);
-            if (!commitFile.exists()) break;
+            if (!commitFile.exists()) {
+                break;
+            }
             Commit commit = readObject(commitFile, Commit.class);
             current = commit.getParent();
         }
 
         for (String commitId : commitToCopy) {
             File localCommitFile = join(COMMIT_DIR, commitId);
-            File remoteCommitFile = join(reomteDir, "commmits", commitId);
+            File remoteCommitFile = join(reomteDir, "commits", commitId);
 
             if (!remoteCommitFile.exists()) {
                 Commit commit = readObject(localCommitFile , Commit.class);
@@ -915,7 +917,7 @@ public class Repository {
     public void fetch(String remoteName, String remoteBranchName) {
         File remoteFile = join(REMOTES, remoteName);
         if (!remoteFile.exists()) {
-            System.out.println("A remote with that name does exist.");
+            System.out.println("A remote with that name does not exist.");
             return;
         }
 
@@ -1013,7 +1015,7 @@ public class Repository {
                 }
 
                 String secondParent = commit.getSecondParent();
-                if (parent != null) {
+                if (secondParent != null) {
                     queue.add(secondParent);
                 }
             }
