@@ -55,7 +55,9 @@ public class Commit implements Serializable {
         return id;
     }
 
-    public String getSecondParent() { return secondParent; }
+    public String getSecondParent() {
+        return secondParent;
+    }
 
     public void setId(String commitId) {
         this.id = commitId;
