@@ -877,7 +877,7 @@ public class Repository {
     }
 
     private void copyCommitsToRemote(String currentCommitId, String remoteCommitId,
-                                     File reomteDir) {
+                                     File remoteDir) {
         List<String> commitToCopy = new ArrayList<>();
         String current = currentCommitId;
         while (current != null && !current.equals(remoteCommitId)) {
@@ -892,17 +892,17 @@ public class Repository {
 
         for (String commitId : commitToCopy) {
             File localCommitFile = join(COMMIT_DIR, commitId);
-            File remoteCommitFile = join(reomteDir, "commits", commitId);
+            File remoteCommitFile = join(remoteDir, "commits", commitId);
 
             if (!remoteCommitFile.exists()) {
-                Commit commit = readObject(localCommitFile , Commit.class);
+                Commit commit = readObject(localCommitFile, Commit.class);
                 writeObject(remoteCommitFile, commit);
 
                 HashMap<String, String> blobs = commit.getBlobs();
                 if (blobs != null) {
                     for (String blobId : blobs.values()) {
                         File localBlobFile = join(BLOB_DIR, blobId);
-                        File remoteBlobFile = join(reomteDir, "blobs", blobId);
+                        File remoteBlobFile = join(remoteDir, "blobs", blobId);
 
                         if (!remoteBlobFile.exists() && localBlobFile.exists()) {
                             byte[] content = readContents(localBlobFile);
@@ -938,6 +938,11 @@ public class Repository {
         String remoteHead = readContentsAsString(remoteBranchFile);
         String localTrackingBranchName = remoteName + "/" + remoteBranchName;
         File localTrackingBranchFile = join(BRANCHES, localTrackingBranchName);
+
+        File parentDir = localTrackingBranchFile.getParentFile();
+        if (!parentDir.exists()) {
+            parentDir.mkdir();
+        }
 
         String localTrackingHead = null;
         if (localTrackingBranchFile.exists()) {
