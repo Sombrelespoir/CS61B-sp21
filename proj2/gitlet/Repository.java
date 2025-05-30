@@ -1,5 +1,6 @@
 package gitlet;
 
+import javax.print.DocFlavor;
 import java.io.File;
 import java.util.*;
 import static gitlet.Utils.*;
@@ -160,6 +161,7 @@ public class Repository {
         System.out.println("=== Branches ===");
         String currentBranch = readContentsAsString(CURRENT_BRANCH);
         List<String> branches = plainFilenamesIn(BRANCHES);
+        Collections.sort(branches);
         for (String branch : branches) {
             if (branch.equals(currentBranch)) {
                 System.out.println("*" + branch);
@@ -170,22 +172,125 @@ public class Repository {
 
         System.out.println("\n=== Staged Files ===");
         HashMap<String, String> stagingArea = readObject(STAGING_AREA, HashMap.class);
-        for (String file : stagingArea.keySet()) {
+        List<String> stagedFiles = new ArrayList<>(stagingArea.keySet());
+        Collections.sort(stagedFiles);
+        for (String file : stagedFiles) {
             System.out.println(file);
         }
 
         System.out.println("\n=== Removed Files ===");
         HashMap<String, Boolean> removalArea = readObject(REMOVAL_AREA, HashMap.class);
-        for (String file : removalArea.keySet()) {
+        List<String> removalFiles = new ArrayList<>(removalArea.keySet());
+        Collections.sort(removalFiles);
+        for (String file : removalFiles) {
             System.out.println(file);
         }
 
         System.out.println("\n=== Modifications Not Staged For Commit ===");
-        // Wait for implement
+        List<String> modifications = getModificationsNotStaged();
+        Collections.sort(modifications);
+        for (String file : modifications) {
+            System.out.println(file);
+        }
 
         System.out.println("\n=== Untracked Files ===");
-        // Wait for implement
+        List<String> untrackedFiles = getUntrackedFiles();
+        Collections.sort(untrackedFiles);
+        for (String file : untrackedFiles) {
+            System.out.println(file);
+        }
+    }
 
+    private List<String> getModificationsNotStaged() {
+        List<String> modifications = new ArrayList<>();
+
+        HashMap<String, String> stagingArea = readObject(STAGING_AREA, HashMap.class);
+        HashMap<String, Boolean> removalArea = readObject(REMOVAL_AREA, HashMap.class);
+
+        String currentCommitId = readContentsAsString(HEAD);
+        File currentCommitFile = join(COMMIT_DIR, currentCommitId);
+        Commit currentCommit = readObject(currentCommitFile, Commit.class);
+        HashMap<String, String> currentBlobs = currentCommit.getBlobs();
+        if (currentBlobs == null) {
+            currentBlobs = new HashMap<>();
+        }
+        List<String> workingDirFiles = plainFilenamesIn(CWD);
+        HashSet<String> workingDirSet = new HashSet<>();
+        if (workingDirSet != null) {
+            workingDirSet.addAll(workingDirFiles);
+        }
+        HashSet<String> allTrackedFiles = new HashSet<>();
+        allTrackedFiles.addAll(currentBlobs.keySet());
+        allTrackedFiles.addAll(stagingArea.keySet());
+        for (String file : allTrackedFiles) {
+            File workingFile = join(CWD, file);
+            if (currentBlobs.containsKey(file)
+                && !workingFile.exists()
+                && !removalArea.containsKey(file)) {
+                modifications.add(file + " (deleted)");
+                continue;
+            }
+
+            if (stagingArea.containsKey(file)
+                && !workingFile.exists()) {
+                modifications.add(file + " (deleted)");
+            }
+
+            if (workingFile.exists()) {
+                byte[] workingContents = readContents(workingFile);
+                String workingBlobId = sha1(workingContents);
+
+                if (stagingArea.containsKey(file)) {
+                    String stagedBlobId = stagingArea.get(file);
+                    if (!workingBlobId.equals(stagedBlobId)) {
+                        modifications.add(file + " (modified)");
+                    }
+                }
+                // File is in current commit, not staged, but working version differs
+                else if (currentBlobs.containsKey(file)) {
+                    String committedBlobId = currentBlobs.get(file);
+                    if (!workingBlobId.equals(committedBlobId)) {
+                        modifications.add(file + " (modified)");
+                    }
+                }
+            }
+        }
+        
+        return modifications;
+    }
+
+    private List<String> getUntrackedFiles() {
+        List<String> untrackedFiles = new ArrayList<>();
+        List<String> workingDirFiles = plainFilenamesIn(CWD);
+
+        if (workingDirFiles == null) {
+            return untrackedFiles;
+        }
+
+        HashMap<String, String> stagingArea = readObject(STAGING_AREA, HashMap.class);
+        HashMap<String, Boolean> removalArea = readObject(REMOVAL_AREA, HashMap.class);
+
+        String currentCommitId = readContentsAsString(HEAD);
+        File currentCommitFile = join(COMMIT_DIR, currentCommitId);
+        Commit currentCommit = readObject(currentCommitFile, Commit.class);
+        HashMap<String, String> currentBlobs = currentCommit.getBlobs();
+        if (currentBlobs == null) {
+            currentBlobs = new HashMap<>();
+        }
+
+        for (String file : workingDirFiles) {
+            if (file.equals(".gitlet")) {
+                continue;
+            }
+
+            if (!currentBlobs.containsKey(file)
+                && !stagingArea.containsKey(file)
+                && !removalArea.containsKey(file)) {
+                untrackedFiles.add(file);
+            }
+        }
+
+        return untrackedFiles;
     }
 
     public void log() {
@@ -1027,5 +1132,6 @@ public class Repository {
         }
         return commitsToCopy;
     }
+
 
 }
