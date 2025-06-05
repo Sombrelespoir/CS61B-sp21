@@ -4,7 +4,7 @@ import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
 public class CorridorBuilder {
-    private World world;
+    private final World world;
 
     public void CorridorBuilder(World world) {
         this.world = world;

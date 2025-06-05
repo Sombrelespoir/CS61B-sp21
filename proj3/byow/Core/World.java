@@ -45,7 +45,7 @@ public class World implements Serializable {
     }
 
     public TETile getTile(int x, int y) {
-        if (x >= 0 && x < width && y > 0 && y < height) {
+        if (x >= 0 && x < width && y >= 0 && y < height) {
             return tiles[x][y];
         }
         return Tileset.NOTHING;

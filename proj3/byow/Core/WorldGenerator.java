@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Random;
 
 public class WorldGenerator {
-    private World world;
-    private Random random;
-    private List<Room> rooms;
+    private final World world;
+    private final Random random;
+    private final List<Room> rooms;
 
     public WorldGenerator(World world, Random random) {
         this.world = world;
@@ -18,7 +18,9 @@ public class WorldGenerator {
     public void generate() {
         generateRooms();
 
-        generateCorridors();
+        if (!rooms.isEmpty()) {
+            generateCorridors();
+        }
     }
 
     public void generateRooms() {
@@ -49,6 +51,9 @@ public class WorldGenerator {
     }
 
     public void generateCorridors() {
+        if (rooms.size() < 2) {
+            return;
+        }
         KruskalMST mst = new KruskalMST(rooms);
         List<Edge> corridors = mst.getMininumSpanningTree();
 
@@ -63,7 +68,7 @@ public class WorldGenerator {
         int x2 = room2.getCenterX();
         int y2 = room2.getCenterY();
 
-        CorridorBuilder builder = new CorridorBuilder();
+        CorridorBuilder builder = new CorridorBuilder(world);
         builder.buildCorridor(x1, y1, x2, y2);
     }
 }
