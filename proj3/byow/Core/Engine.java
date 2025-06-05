@@ -62,6 +62,9 @@ public class Engine {
     }
 
     public void analyseInput(String input) {
+        if (input.isEmpty()) {
+            return;
+        }
         if (input.charAt(0) == 'n' || input.charAt(0) == 'N') {
             int sPosition = -1;
             for (int i = 1; i < input.length(); i++) {
@@ -78,16 +81,16 @@ public class Engine {
             }
 
             SEED = Long.parseLong(number.toString());
-            input = input.substring(sPosition);
-        }
-
-        if (input.charAt(0) == 'l' || input.charAt(0) == 'L') {
+            input = input.substring(sPosition + 1);
+        } else if (input.charAt(0) == 'l' || input.charAt(0) == 'L') {
             needToLoad = true;
+            input = input.substring(1);
         }
 
         StringBuilder commandString = new StringBuilder();
-        for (int i = 0; i <= input.length(); i++) {
-            switch (input.charAt(i)) {
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            switch (c) {
                 case 's', 'S':
                     commandString.append('s');
                     break;
@@ -101,18 +104,16 @@ public class Engine {
                     commandString.append('d');
                     break;
                 case ':':
-                    if (input.charAt(i + 1) == 'q'
-                            || input.charAt(i + 1) == 'Q') {
+                    if (i + 1 < input.length() && (input.charAt(i + 1) == 'q' || input.charAt(i + 1) == 'Q')) {
                         isPlaying = false;
                         saveWorld();
-                        break;
+                        i++;
                     }
+                    break;
             }
         }
         COMMAND = commandString.toString();
-        if (!COMMAND.isEmpty()) {
-            hasCommand = true;
-        }
+        hasCommand = !COMMAND.isEmpty();
     }
 
     public void load() {
