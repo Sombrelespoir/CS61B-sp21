@@ -7,8 +7,16 @@ public class Engine {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
-    public static final int HEIGHT = 30;
+    public static final int HEIGHT = 40;
 
+    private World world;
+    private long SEED = 0L;
+    private String COMMAND = "";
+
+
+    private boolean isPlaying = false;
+    private boolean hasCommand = false;
+    private boolean needToLoad = false;
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
@@ -38,15 +46,86 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        // TODO: Fill out this method so that it run the engine using the input
-        // passed in as an argument, and return a 2D tile representation of the
-        // world that would have been drawn if the same inputs had been given
-        // to interactWithKeyboard().
-        //
-        // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
-        // that works for many different input types.
+        analyseInput(input);
 
-        TETile[][] finalWorldFrame = null;
-        return finalWorldFrame;
+        if (needToLoad) {
+            load();
+        } else {
+            world = new World(WIDTH, HEIGHT, SEED);
+            isPlaying = true;
+        }
+        if (hasCommand) {
+            movePlayer();
+        }
+
+        return world.getTiles();
     }
+
+    public void analyseInput(String input) {
+        if (input.charAt(0) == 'n' || input.charAt(0) == 'N') {
+            int sPosition = -1;
+            for (int i = 1; i < input.length(); i++) {
+                if (input.charAt(i) == 'S' || input.charAt(i) == 's') {
+                    sPosition = i;
+                    break;
+                }
+            }
+
+            StringBuilder number = new StringBuilder();
+            for (int i = 1; i < sPosition; i++) {
+                char c = input.charAt(i);
+                number.append(c);
+            }
+
+            SEED = Long.parseLong(number.toString());
+            input = input.substring(sPosition);
+        }
+
+        if (input.charAt(0) == 'l' || input.charAt(0) == 'L') {
+            needToLoad = true;
+        }
+
+        StringBuilder commandString = new StringBuilder();
+        for (int i = 0; i <= input.length(); i++) {
+            switch (input.charAt(i)) {
+                case 's', 'S':
+                    commandString.append('s');
+                    break;
+                case 'w', 'W':
+                    commandString.append('w');
+                    break;
+                case 'a', 'A':
+                    commandString.append('a');
+                    break;
+                case 'd', 'D':
+                    commandString.append('d');
+                    break;
+                case ':':
+                    if (input.charAt(i + 1) == 'q'
+                            || input.charAt(i + 1) == 'Q') {
+                        isPlaying = false;
+                        saveWorld();
+                        break;
+                    }
+            }
+        }
+        COMMAND = commandString.toString();
+        if (!COMMAND.isEmpty()) {
+            hasCommand = true;
+        }
+    }
+
+    public void load() {
+
+    }
+
+    public void movePlayer() {
+
+    }
+
+    public void saveWorld() {
+
+    }
+
+
 }
