@@ -2,8 +2,7 @@ package byow.TileEngine;
 
 import java.awt.*;
 
-import static byow.Core.Utils.CWD;
-import static byow.Core.Utils.join;
+
 
 /**
  * Contains constant tile objects, to avoid having to remake the same tiles in different parts of
