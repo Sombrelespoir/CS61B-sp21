@@ -1,6 +1,9 @@
 package byow.TileEngine;
 
-import java.awt.Color;
+import java.awt.*;
+
+import static byow.Core.Utils.CWD;
+import static byow.Core.Utils.join;
 
 /**
  * Contains constant tile objects, to avoid having to remake the same tiles in different parts of
@@ -33,6 +36,10 @@ public class Tileset {
     public static final TETile SAND = new TETile('▒', Color.yellow, Color.black, "sand");
     public static final TETile MOUNTAIN = new TETile('▲', Color.gray, Color.black, "mountain");
     public static final TETile TREE = new TETile('♠', Color.green, Color.black, "tree");
+    public static final TETile ROOM = new TETile('-', Color.darkGray, Color.BLACK, "room");
+    public static final TETile MIZUKI = new TETile('M', Color.black, Color.black, "Mizuki");
+    public static final TETile ENTRY = new TETile('*', Color.darkGray, Color.black, "entry");
 }
+
 
 

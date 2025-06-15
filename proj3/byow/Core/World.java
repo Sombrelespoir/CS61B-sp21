@@ -1,65 +1,127 @@
 package byow.Core;
 
+import byow.Core.Maps.Road;
+import byow.Core.Maps.Room;
+import byow.Core.Maps.Wall;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
 import java.io.Serializable;
-import java.util.Random;
 
+/**
+ * Represents the rouge-like world.
+ *
+ * @author Edward Tsang
+ */
 public class World implements Serializable {
     private final int width;
     private final int height;
-    private final long seed;
     private TETile[][] tiles;
+    private Point entry;
+    private Point exit;
 
-    public World(int w, int h, long s) {
-        this.width = w;
-        this.height = h;
-        this.seed = s;
-        initializeWorld(s);
+    World(int w, int h) {
+        width = w;
+        height = h;
+        tiles = new TETile[w][h];
     }
 
     public void initializeWorld(long seed) {
-        Random random = new Random(seed);
-        tiles = new TETile[width][height];
+        Variables v = new Variables(seed);
+        fillWithNothing();
+        Room.createRooms(this, v);
+        Wall.createWalls(this);
+        Road.createRoad(this, v);
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        initializeAreas(v);
+        Wall.findConnection(this, v);
+        Wall.connectAreas(this, v);
+        Road.removeDeadEnds(this);
+        Wall.buildWallNearUnit(this);
+        Wall.creatEntryAndExit(this, v);
+    }
+
+    private void initializeAreas(Variables v) {
+        v.getRoot().clear();
+        Road.addRoadsToArea(this, v);
+        Room.addRoomsToArea(v);
+        v.setMainArea(Room.getRandomRoom(v));
+    }
+
+    public void fillWithNothing() {
+        for (int x = 0; x < width; x += 1) {
+            for (int y = 0; y < height; y += 1) {
                 tiles[x][y] = Tileset.NOTHING;
             }
         }
-
-        WorldGenerator generator = new WorldGenerator(this, random);
-        generator.generate();
-
     }
 
-    public void setTile(int x, int y, TETile tile) {
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            tiles[x][y] = tile;
-        }
+    @Override
+    public World clone() {
+        World ret = new World(width, height);
+        ret.tiles = TETile.copyOf(tiles);
+        ret.entry = entry;
+        ret.exit = exit;
+        return ret;
     }
 
-    public TETile[][] getTiles() {
-        return tiles;
+    public Point getEntry() {
+        return entry;
     }
 
-    public TETile getTile(int x, int y) {
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            return tiles[x][y];
-        }
-        return Tileset.NOTHING;
+    public void setEntry(Point entry) {
+        this.entry = entry;
     }
 
-    public int getHeight() {
-        return height;
+    public Point getExit() {
+        return exit;
+    }
+
+    public void setExit(Point exit) {
+        this.exit = exit;
     }
 
     public int getWidth() {
         return width;
     }
 
-    public long getSeed() {
-        return seed;
+    public int getHeight() {
+        return height;
+    }
+
+    public TETile[][] getTiles() {
+        return tiles;
+    }
+
+    public int getRandomX(int w, Variables v) {
+        return v.getRANDOM().nextInt((width - w - 1) / 2) * 2 + 1;
+    }
+
+    public int getRandomY(int h, Variables v) {
+        return v.getRANDOM().nextInt((height - h - 1) / 2) * 2 + 1;
+    }
+
+    public boolean isNothing(int x, int y) {
+        return tiles[x][y].equals(Tileset.NOTHING);
+    }
+
+    public boolean isWall(int x, int y) {
+        return tiles[x][y].equals(Tileset.WALL);
+    }
+
+    public boolean isRoom(int x, int y) {
+        return tiles[x][y].equals(Tileset.ROOM);
+    }
+
+    public boolean isRoad(int x, int y) {
+        return tiles[x][y].equals(Tileset.FLOOR);
+    }
+
+    public boolean isUnit(int x, int y) {
+        return isRoom(x, y) || isRoad(x, y) || isDoor(x, y);
+    }
+
+    public boolean isDoor(int x, int y) {
+        return tiles[x][y].equals(Tileset.UNLOCKED_DOOR);
     }
 }

@@ -1,27 +1,47 @@
 package byow.Core;
 
+import byow.Core.HUD.Framework;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
+import static byow.Core.Utils.*;
+
 public class Engine {
+    /* IF you want to modify width smaller than 81
+     * or height smaller than 61,
+     * please do modify the minimum size of room as well */
+    public static final int WIDTH = 81;
+    public static final int HEIGHT = 61;
+    boolean start = false;
     TERenderer ter = new TERenderer();
-    /* Feel free to change the width and height. */
-    public static final int WIDTH = 80;
-    public static final int HEIGHT = 40;
+    Variables v = new Variables();
+    /*World world = new World(WIDTH - 3, HEIGHT - 3);
+    World tempWorld;
+    Characters characters;*/
 
-    private World world;
-    private long SEED = 0L;
-    private String COMMAND = "";
-
-
-    private boolean isPlaying = false;
-    private boolean hasCommand = false;
-    private boolean needToLoad = false;
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
+        ter.initialize(WIDTH, HEIGHT, 2, 2);
+
+        Framework f = new Framework();
+        f.drawMenu();
+
+        while (true) {
+            StringBuilder input = new StringBuilder();
+            if (!start) {
+                getStarted(input);
+            } else {
+                inputCommands(input);
+            }
+            TETile[][] tiles = interactWithInputString(input.toString());
+            if (tiles == null) {
+                return;
+            }
+            f.drawFramework(ter, tiles);
+        }
     }
 
     /**
@@ -29,104 +49,44 @@ public class Engine {
      * of characters (for example, "n123sswwdasdassadwas", "n123sss:q", "lwww". The engine should
      * behave exactly as if the user typed these characters into the engine using
      * interactWithKeyboard.
-     *
+     * <p>
      * Recall that strings ending in ":q" should cause the game to quite save. For example,
      * if we do interactWithInputString("n123sss:q"), we expect the game to run the first
      * 7 commands (n123sss) and then quit and save. If we then do
      * interactWithInputString("l"), we should be back in the exact same state.
-     *
+     * <p>
      * In other words, both of these calls:
-     *   - interactWithInputString("n123sss:q")
-     *   - interactWithInputString("lww")
-     *
+     * - interactWithInputString("n123sss:q")
+     * - interactWithInputString("lww")
+     * <p>
      * should yield the exact same world state as:
-     *   - interactWithInputString("n123sssww")
+     * - interactWithInputString("n123sssww")
      *
      * @param input the input string to feed to your program
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        analyseInput(input);
+        input = fixInputString(this, input);
+        if (!start) {
+            if (input.contains("L")) {
+                v = load();
+                input = input.substring(1);
+            } else {
+                // if commit to autograder, use these two contents
+                /*long seed = Long.parseLong(input, begin+1, end, 10);
+                World world = new World(seed, WIDTH, HEIGHT);*/
 
-        if (needToLoad) {
-            load();
-        } else {
-            world = new World(WIDTH, HEIGHT, SEED);
-            isPlaying = true;
-        }
-        if (hasCommand) {
-            movePlayer();
-        }
-
-        return world.getTiles();
-    }
-
-    public void analyseInput(String input) {
-        if (input.isEmpty()) {
-            return;
-        }
-        if (input.charAt(0) == 'n' || input.charAt(0) == 'N') {
-            int sPosition = -1;
-            for (int i = 1; i < input.length(); i++) {
-                if (input.charAt(i) == 'S' || input.charAt(i) == 's') {
-                    sPosition = i;
-                    break;
-                }
+                // if debug or play locally ,use these
+                int end = input.indexOf('S') + 1;
+                generateWorld(v, input.substring(0, end));
+                input = input.substring(end);
             }
-
-            StringBuilder number = new StringBuilder();
-            for (int i = 1; i < sPosition; i++) {
-                char c = input.charAt(i);
-                number.append(c);
-            }
-
-            SEED = Long.parseLong(number.toString());
-            input = input.substring(sPosition + 1);
-        } else if (input.charAt(0) == 'l' || input.charAt(0) == 'L') {
-            needToLoad = true;
-            input = input.substring(1);
+            start = true;
         }
-
-        StringBuilder commandString = new StringBuilder();
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            switch (c) {
-                case 's', 'S':
-                    commandString.append('s');
-                    break;
-                case 'w', 'W':
-                    commandString.append('w');
-                    break;
-                case 'a', 'A':
-                    commandString.append('a');
-                    break;
-                case 'd', 'D':
-                    commandString.append('d');
-                    break;
-                case ':':
-                    if (i + 1 < input.length() && (input.charAt(i + 1) == 'q' || input.charAt(i + 1) == 'Q')) {
-                        isPlaying = false;
-                        saveWorld();
-                        i++;
-                    }
-                    break;
-            }
+        move(v, input);
+        if (input.indexOf(':') > -1) {
+            quit(v);
         }
-        COMMAND = commandString.toString();
-        hasCommand = !COMMAND.isEmpty();
+        return v.tempWorld.getTiles();
     }
-
-    public void load() {
-
-    }
-
-    public void movePlayer() {
-
-    }
-
-    public void saveWorld() {
-
-    }
-
-
 }
